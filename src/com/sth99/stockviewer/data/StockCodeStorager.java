@@ -2,61 +2,23 @@ package com.sth99.stockviewer.data;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import com.sth99.stockviewer.util.MathAdv;
 
 /**
  * Created by STH99 on 2016/12/8.
  */
 public class StockCodeStorager {
     ArrayList<StockCodeData> codeList;
-    ArrayList<Tuple<Integer, Integer>> fastIndexer;
-    private int lastCode = -1;
 
     public StockCodeStorager() {
-        codeList = new ArrayList<>();
-        fastIndexer = new ArrayList<>();
+        codeList = new ArrayList<>(4096);
         getWebData();
     }
 
     private void add(StockCodeData data) {
         codeList.add(data);
-        if (lastCode == -1) {
-            lastCode = data.getNumCode();
-            fastIndexer.add(new Tuple<>(lastCode, codeList.size() - 1));
-        } else if (lastCode == data.getNumCode() - 1) {
-            lastCode = data.getNumCode();
-        } else if (data.getNumCode() % 1000 == 0) {
-            //整1000
-            lastCode = data.getNumCode();
-            fastIndexer.add(new Tuple<>(lastCode, codeList.size() - 1));
-        } else {
-            //断开
-            lastCode = data.getNumCode();
-            fastIndexer.add(new Tuple<>(lastCode, codeList.size() - 1));
-        }
-    }
-
-    private int pow10(int times) {
-        int result = 1;
-        for (int i = 0; i < times; i++) {
-            result *= 10;
-        }
-        return result;
-    }
-
-    private int findStart(String indexString) {
-        int end = indexString.length() - 1;
-        int index = Integer.parseInt(indexString);
-        int start = -1;
-        int i = 0;
-        index *= pow10(StockCodeData.CODE_LENGTH - indexString.length());
-        while (fastIndexer.get(i).a < index) {
-            start = fastIndexer.get(i).b;
-            i++;
-        }
-        while (!codeList.get(start).getCode().substring(0, end).equals(indexString)) {
-            start++;
-        }
-        return start;
     }
 
     private void getWebData() {
@@ -74,25 +36,54 @@ public class StockCodeStorager {
         }
     }
 
-    public void showFastIndexer() {
-        for (Tuple<Integer, Integer> integerIntegerTuple : fastIndexer) {
-            System.out.println(integerIntegerTuple);
-        }
+    public ArrayList<StockCodeData> getStockList() {
+        return codeList;
     }
 
-    public ArrayList<StockCodeData> getStockCodeData(String indexString) {
+    public ArrayList<StockCodeData> getStockListFrom(int rangeStart, int rangeEnd) {
         ArrayList<StockCodeData> list = new ArrayList<>();
-        if (indexString.length() > 6) {
-            return list;
+        int i = 0;
+        while (i < codeList.size() && codeList.get(i).getNumCode() < rangeStart)
+            i++;
+        while (i < codeList.size() && codeList.get(i).getNumCode() < rangeEnd) {
+            list.add(codeList.get(i));
+            i++;
         }
-        int indexStart = findStart(indexString);
-        while (true) {
-            StockCodeData data = codeList.get(indexStart);
-            list.add(data);
-            if (!data.getCode().substring(0, StockCodeData.CODE_LENGTH - indexString.length()).equals(indexString))
-                break;
-            indexStart++;
+        while (i < codeList.size() && codeList.get(i).getBelong() == StockBelong.sh)
+            i++;
+        while (i < codeList.size() && codeList.get(i).getNumCode() < rangeStart)
+            i++;
+        while (i < codeList.size() && codeList.get(i).getNumCode() < rangeEnd) {
+            list.add(codeList.get(i));
+            i++;
         }
         return list;
+    }
+
+    /**
+     * 外部调用获取股票代码表
+     * <p>
+     * 用于股票代码查找
+     * 传入“610”会返回610000到610999的StockCodeData
+     *
+     * @param rangeStart 开始的字符串
+     * @return
+     */
+    public ArrayList<StockCodeData> getStockListFrom(String rangeStart) {
+        if (rangeStart == null || rangeStart.equals(""))
+            return getStockList();
+        Pattern nonDigit = Pattern.compile("\\D");
+        Matcher matcher = nonDigit.matcher(rangeStart);
+        if (matcher.find())
+            return null;
+        if (rangeStart.length() == 6) {
+            int code = Integer.parseInt(rangeStart);
+            return getStockListFrom(code, code);
+        }
+        int start, end;
+        int need = 6 - rangeStart.length();
+        start = Integer.parseInt(rangeStart) * MathAdv.pow(10, need);
+        end = start + MathAdv.pow(10, need) - 1;
+        return getStockListFrom(start, end);
     }
 }

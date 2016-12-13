@@ -11,6 +11,7 @@ public class StockCodeData extends Data {
     StockBelong belong;
 
     public static final int CODE_LENGTH = 6;
+    public static final boolean useDefaultToStringMethod = false;
 
     public StockCodeData(String name, String code, StockBelong belong) {
         this.name = name;
@@ -54,14 +55,18 @@ public class StockCodeData extends Data {
 
     @Override
     public String toString() {
-        return "StockCodeData{" +
-                "name='" + name + '\'' +
-                ", code='" + code + '\'' +
-                ", belong=" + belong +
-                '}';
+        if (useDefaultToStringMethod)
+            return "StockCodeData{" +
+                    "name='" + name + '\'' +
+                    ", code='" + code + '\'' +
+                    ", belong=" + belong +
+                    '}';
+        return name + " " + getFullCode();
     }
 }
 
 enum StockBelong {
-    sh, sz
+    sh, sz;
+
+    static final int COUNT = 2;
 }
