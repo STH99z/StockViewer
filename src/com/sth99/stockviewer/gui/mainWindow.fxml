@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
@@ -39,12 +38,12 @@
     <bottom>
         <TabPane prefHeight="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
             <tabs>
-                <Tab text="Console Out">
-                    <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                    </content>
+                <Tab text="代码控制台">
+               <content>
+                  <AnchorPane fx:id="consolePane" prefHeight="200.0" prefWidth="200.0" />
+               </content>
                 </Tab>
-                <Tab text="Graph2">
+                <Tab text="其他图表">
                     <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
                     </content>
@@ -62,33 +61,20 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <TitledPane fx:id="paneStockList" alignment="TOP_LEFT" collapsible="false" minHeight="-Infinity" minWidth="-Infinity" text="股票列表" GridPane.valignment="TOP" GridPane.vgrow="ALWAYS">
+            <TitledPane fx:id="stockListPane" alignment="TOP_LEFT" collapsible="false" minHeight="-Infinity" minWidth="-Infinity" text="股票列表" GridPane.valignment="TOP" GridPane.vgrow="ALWAYS">
                <content>
-                  <BorderPane prefWidth="200.0">
+                  <BorderPane prefHeight="278.0" prefWidth="200.0">
                      <top>
-                        <HBox prefWidth="200.0" spacing="2.0" BorderPane.alignment="CENTER">
+                        <HBox prefHeight="28.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                            <children>
-                              <Label prefWidth="90.0" text="股票代码">
-                                 <padding>
-                                    <Insets top="3.0" />
-                                 </padding></Label>
-                              <TextField fx:id="codeField"/>
+                              <Label fx:id="stockListLable" text="股票代码 " />
+                              <TextField fx:id="stockListField" prefWidth="128.0" />
                            </children>
-                           <padding>
-                              <Insets bottom="10.0" />
-                           </padding>
                         </HBox>
                      </top>
                      <center>
-                        <ListView fx:id="codeListView" prefHeight="224.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                           <BorderPane.margin>
-                              <Insets />
-                           </BorderPane.margin>
-                        </ListView>
+                        <ListView fx:id="stockListView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
                      </center>
-                     <opaqueInsets>
-                        <Insets />
-                     </opaqueInsets>
                   </BorderPane>
                </content></TitledPane>
             <TitledPane fx:id="paneChosenList" alignment="TOP_LEFT" collapsible="false" minHeight="-Infinity" minWidth="-Infinity" text="自选股" GridPane.rowIndex="1" GridPane.valignment="TOP" GridPane.vgrow="ALWAYS">

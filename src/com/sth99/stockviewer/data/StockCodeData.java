@@ -64,9 +64,3 @@ public class StockCodeData extends Data {
         return name + " " + getFullCode();
     }
 }
-
-enum StockBelong {
-    sh, sz;
-
-    static final int COUNT = 2;
-}

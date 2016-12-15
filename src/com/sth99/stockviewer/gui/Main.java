@@ -20,8 +20,6 @@ public class Main extends Application {
         primaryStage.show();
     }
 
-    static Consumer<Object> c = System.out::println;
-
     public static void main(String[] args) {
         launch(args);
     }

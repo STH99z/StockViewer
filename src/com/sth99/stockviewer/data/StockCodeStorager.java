@@ -23,8 +23,9 @@ public class StockCodeStorager {
 
     private void getWebData() {
         try {
-            WebData webData = new WebData("http://quote.eastmoney.com/stocklist.html");
             String pat = "<a target=\"_blank\" href=\"http://quote\\.eastmoney\\.com/(\\S+?)\\.html\">(\\S+?)\\((\\d+?)\\)</a>";
+            WebData webData = new WebData("http://quote.eastmoney.com/stocklist.html");
+            webData.setCharsetName("gb2312");
             webData.getData();
             Matcher m = webData.filterData(pat);
             while (m.find()) {
@@ -40,12 +41,12 @@ public class StockCodeStorager {
         return codeList;
     }
 
-    public ArrayList<StockCodeData> getStockListFrom(int rangeStart, int rangeEnd) {
+    public synchronized ArrayList<StockCodeData> getStockListFrom(int rangeStart, int rangeEnd) {
         ArrayList<StockCodeData> list = new ArrayList<>();
         int i = 0;
         while (i < codeList.size() && codeList.get(i).getNumCode() < rangeStart)
             i++;
-        while (i < codeList.size() && codeList.get(i).getNumCode() < rangeEnd) {
+        while (i < codeList.size() && codeList.get(i).getNumCode() <= rangeEnd) {
             list.add(codeList.get(i));
             i++;
         }
@@ -53,7 +54,7 @@ public class StockCodeStorager {
             i++;
         while (i < codeList.size() && codeList.get(i).getNumCode() < rangeStart)
             i++;
-        while (i < codeList.size() && codeList.get(i).getNumCode() < rangeEnd) {
+        while (i < codeList.size() && codeList.get(i).getNumCode() <= rangeEnd) {
             list.add(codeList.get(i));
             i++;
         }
@@ -69,13 +70,13 @@ public class StockCodeStorager {
      * @param rangeStart 开始的字符串
      * @return
      */
-    public ArrayList<StockCodeData> getStockListFrom(String rangeStart) {
+    public synchronized ArrayList<StockCodeData> getStockListFrom(String rangeStart) {
         if (rangeStart == null || rangeStart.equals(""))
             return getStockList();
         Pattern nonDigit = Pattern.compile("\\D");
         Matcher matcher = nonDigit.matcher(rangeStart);
         if (matcher.find())
-            return null;
+            return new ArrayList<>(0);
         if (rangeStart.length() == 6) {
             int code = Integer.parseInt(rangeStart);
             return getStockListFrom(code, code);
