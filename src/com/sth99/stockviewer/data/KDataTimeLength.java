@@ -17,12 +17,9 @@ public enum KDataTimeLength {
 //    http://data.gtimg.cn/flashdata/hushen/latest/weekly/sz000002.js?maxage=43201
 //    月k
 //    http://data.gtimg.cn/flashdata/hushen/monthly/sz000002.js?maxage=43201
-
-    minute("minute"),
-    fourDay("4day"),
-    daily("daily"),
-    weekly("weekly"),
-    monthly("monthly");
+    daily("daily"),//日K
+    weekly("weekly"),//周K
+    monthly("monthly");//月K
 
     KDataTimeLength(String toUrlTag) {
         this.toUrlTag = toUrlTag;
@@ -36,10 +33,6 @@ public enum KDataTimeLength {
 
     public String toUrlPrePart() {
         switch (this) {
-            case minute:
-                return "http://data.gtimg.cn/flashdata/hushen/minute/";
-            case fourDay:
-                return "http://data.gtimg.cn/flashdata/hushen/4day/";
             case daily:
                 return "http://data.gtimg.cn/flashdata/hushen/latest/daily/";
             case monthly:

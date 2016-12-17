@@ -1,6 +1,7 @@
 package com.sth99.stockviewer.data;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
@@ -31,18 +32,28 @@ public class WebData extends Data {
         this.charsetName = charsetName;
     }
 
-    public String getData() throws IOException {
-        if (stringBuffer == null) {
-            inputStreamReader = new InputStreamReader(url.openStream(), charsetName);
-            bufferedReader = new BufferedReader(inputStreamReader);
-            stringBuffer = new StringBuffer(0x1000);
-            while (true) {
-                int read = bufferedReader.read();
-                if (read == -1)
-                    break;
-                stringBuffer.append((char) read);
+    public String getData() {
+        try {
+            if (stringBuffer == null) {
+                inputStreamReader = new InputStreamReader(url.openStream(), charsetName);
+                bufferedReader = new BufferedReader(inputStreamReader);
+                stringBuffer = new StringBuffer(0x1000);
+                while (true) {
+                    int read = bufferedReader.read();
+                    if (read == -1)
+                        break;
+                    stringBuffer.append((char) read);
+                }
+                bufferedReader.close();
             }
-            bufferedReader.close();
+        } catch (FileNotFoundException fnfe) {
+            System.out.println("网络文件未找到");
+            stringBuffer = new StringBuffer();
+        } catch (IOException e) {
+            e.printStackTrace();
+            stringBuffer = new StringBuffer();
+        } finally {
+
         }
         return stringBuffer.toString();
     }
