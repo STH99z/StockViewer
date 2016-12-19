@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.sth99.stockviewer.util.MathAdv;
+import com.sth99.stockviewer.util.MathUtil;
 
 /**
  * Created by STH99 on 2016/12/8.
@@ -83,8 +83,8 @@ public class StockCodeStorager {
         }
         int start, end;
         int need = 6 - rangeStart.length();
-        start = Integer.parseInt(rangeStart) * MathAdv.pow(10, need);
-        end = start + MathAdv.pow(10, need) - 1;
+        start = Integer.parseInt(rangeStart) * MathUtil.pow(10, need);
+        end = start + MathUtil.pow(10, need) - 1;
         return getStockListFrom(start, end);
     }
 }

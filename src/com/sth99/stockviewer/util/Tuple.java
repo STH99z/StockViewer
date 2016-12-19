@@ -1,4 +1,4 @@
-package com.sth99.stockviewer.data;
+package com.sth99.stockviewer.util;
 
 import java.util.Objects;
 

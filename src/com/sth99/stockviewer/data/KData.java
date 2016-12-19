@@ -1,125 +1,95 @@
 package com.sth99.stockviewer.data;
 
-import com.sth99.stockviewer.util.MathAdv;
-
-import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import com.sth99.stockviewer.util.MathUtil;
 
 /**
- * 股票的K线数据
- * Created by STH99 on 2016/12/15.
+ * 单个K线图的数据体
+ * Created by STH99 on 2016/12/19.
  */
-public class KData extends WebData {
-    ////fixme 需要一个factory？
-    private static final String dataFilterPat = "(\\d{2})(\\d{2})(\\d{2}) ([0-9.]+) ([0-9.]+) ([0-9.]+) ([0-9.]+) (\\d+)\\\\n\\\\";
-    static final String[] dataFilterTag = {"", "y", "m", "d", "open", "close", "highest", "lowest", "???"};
-    static final int GROUP_OPEN = 4;
-    static final int GROUP_CLOSE = 5;
-    static final int GROUP_HIGHEST = 6;
-    static final int GROUP_LOWEST = 7;
-    static final int maxAge = 43200;
-
-    static final Pattern dataFilter = Pattern.compile(dataFilterPat);
-
-    StockCodeData code;
-    KDataTimeLength timeLength;
-    ArrayList<String> filteredData;
-    int lastFindIndex = -1;
-
+public class KData extends Data {
     /**
-     * 创建一个5日分时数据
-     *
-     * @param code
-     * @throws MalformedURLException
+     * 两位（十进制）的时间数据
      */
-    public KData(StockCodeData code) throws MalformedURLException {
-        this(code, KDataTimeLength.daily);
-    }
-
+    public short year, month, day;
     /**
-     * 创建一个K线数据
-     *
-     * @param code       股票代码
-     * @param timeLength 时间长度
-     * @throws MalformedURLException
+     * 4个关键值
      */
-    public KData(StockCodeData code, KDataTimeLength timeLength) throws MalformedURLException {
-        super(timeLength.toUrlPrePart() + code.getFullCode() + ".js?maxage=" + maxAge);
-        this.code = code;
-        this.timeLength = timeLength;
-        processData();
+    public double open, close, highest, lowest;
+
+    public KData(short year, short month, short day, double open, double close, double highest, double lowest) {
+        this.year = year;
+        this.month = month;
+        this.day = day;
+        this.open = open;
+        this.close = close;
+        this.highest = highest;
+        this.lowest = lowest;
     }
 
-    private void processData() {
-        Matcher matcher = dataFilter.matcher(getData());
-        filteredData = new ArrayList<>();
-        while (matcher.find()) {
-            filteredData.add(matcher.group(0));
-        }
+    public KData(Date date, double open, double close, double highest, double lowest) {
+        this(MathUtil.getYearShort(date), MathUtil.getMonthShort(date), MathUtil.getDayShort(date),
+                open, close, highest, lowest);
     }
 
-    @Deprecated
-    public String getFilteredData() {
-        String s = "";
-        for (String d : filteredData) {
-            s += d + "\n";
-        }
-        return s;
+    public boolean isSameDate(KData kData) {
+        if (year != kData.year) return false;
+        if (month != kData.month) return false;
+        if (day != kData.day) return false;
+        return true;
     }
 
-    private int findIndex(Date date) {
-        for (int i = 0; i < filteredData.size(); i++) {
-            if (isSameDate(date, filteredData.get(i))) {
-                lastFindIndex = i;
-                return lastFindIndex;
-            }
-        }
-        lastFindIndex = -1;
-        return lastFindIndex;
+    public boolean isSameDate(Date date) {
+        return year == MathUtil.getYearShort(date) &&
+                month == MathUtil.getMonthShort(date) &&
+                day == MathUtil.getDayShort(date);
     }
 
-    private boolean isSameDate(Date date, String dataStr) {
-        String y = dataStr.substring(0, 2);
-        String m = dataStr.substring(2, 4);
-        String d = dataStr.substring(4, 6);
-        return y.equals(MathAdv.getYear(date)) &&
-                m.equals(MathAdv.getMonth(date)) &&
-                d.equals(MathAdv.getDay(date));
+    @Override
+    public String toString() {
+        return "KData{" +
+                "year=" + year +
+                ", month=" + month +
+                ", day=" + day +
+                ", open=" + open +
+                ", close=" + close +
+                ", highest=" + highest +
+                ", lowest=" + lowest +
+                '}';
     }
 
-    public double getOpen(Date date) {
-        return getElement(date, GROUP_OPEN);
+    @Override
+    public boolean equals(Data o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        KData kData = (KData) o;
+
+        if (year != kData.year) return false;
+        if (month != kData.month) return false;
+        if (day != kData.day) return false;
+        if (Double.compare(kData.open, open) != 0) return false;
+        if (Double.compare(kData.close, close) != 0) return false;
+        if (Double.compare(kData.highest, highest) != 0) return false;
+        return Double.compare(kData.lowest, lowest) == 0;
     }
 
-    public double getClose(Date date) {
-        return getElement(date, GROUP_CLOSE);
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        result = (int) year;
+        result = 31 * result + (int) month;
+        result = 31 * result + (int) day;
+        temp = Double.doubleToLongBits(open);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(close);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(highest);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(lowest);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
     }
-
-    public double getHighest(Date date) {
-        return getElement(date, GROUP_HIGHEST);
-    }
-
-    public double getLowest(Date date) {
-        return getElement(date, GROUP_LOWEST);
-    }
-
-    private double getElement(Date date, int index) {
-        if (lastFindIndex == -1)
-            return 0d;
-        if (!isSameDate(date, filteredData.get(lastFindIndex))) {
-            findIndex(date);
-            if (lastFindIndex == -1)
-                return 0d;
-        }
-        Matcher matcher = dataFilter.matcher(filteredData.get(lastFindIndex));
-        matcher.find();
-        return Double.parseDouble(matcher.group(index));
-    }
-
 }
-

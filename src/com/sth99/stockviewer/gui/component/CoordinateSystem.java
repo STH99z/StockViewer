@@ -6,7 +6,7 @@ import javafx.scene.canvas.GraphicsContext;
  * 简单的坐标系统
  * Created by STH99 on 2016/12/17.
  */
-public class CoordinateSystem {
+public class CoordinateSystem implements IDrawable {
     Rectangle graphArea;
     /**
      * 图像上零点的坐标，多数情况应该在graphArea中
@@ -16,6 +16,7 @@ public class CoordinateSystem {
      * xy轴的缩放
      */
     Point scaleXY;
+    private static final boolean DEBUG = true;
 
     public CoordinateSystem(Rectangle graphArea) {
         this.graphArea = graphArea;
@@ -32,8 +33,9 @@ public class CoordinateSystem {
     }
 
     public void locateSystem(double xStart, double xEnd, double yStart, double yEnd) {
-        scaleXY = new Point(graphArea.getAbsWidth() / (xEnd - xStart), graphArea.getAbsHeight() / (yEnd - yStart));
-        zeroPoint = new Point(graphArea.left - xStart * scaleXY.x, graphArea.bottom + yStart * scaleXY.y);
+        Point scaleXY = new Point(graphArea.getAbsWidth() / (xEnd - xStart), graphArea.getAbsHeight() / (yEnd - yStart));
+        Point zeroPoint = new Point(graphArea.left - xStart * scaleXY.x, graphArea.bottom + yStart * scaleXY.y);
+        locateSystem(zeroPoint, scaleXY);
     }
 
     private double reverseY(double y) {
@@ -58,13 +60,61 @@ public class CoordinateSystem {
         return zeroPoint.y - y * scaleXY.y;
     }
 
-    public void drawSystem(GraphicsContext g2d) {
-        g2d.strokeRect(graphArea.left, graphArea.top, graphArea.getAbsWidth(), graphArea.getHeight());
-        g2d.strokeLine(zeroPoint.x - 3, zeroPoint.y, zeroPoint.x + 3, zeroPoint.y);
-        g2d.strokeLine(zeroPoint.x, zeroPoint.y - 3, zeroPoint.x, zeroPoint.y + 3);
-        g2d.strokeLine(zeroPoint.x - 2, zeroPoint.y - 2, zeroPoint.x + 2, zeroPoint.y + 2);
-        g2d.strokeLine(zeroPoint.x + 2, zeroPoint.y - 2, zeroPoint.x - 2, zeroPoint.y + 2);
+    /**
+     * 就是绘制一下这个坐标系，debug用。
+     *
+     * @param g2d
+     * @param system 填写null就ok。只是为了和接口保持一致。
+     */
+    public void draw(GraphicsContext g2d, CoordinateSystem system) {
+        drawFrame(g2d);
+        drawZeroPoint(g2d);
+        drawZeroPointLine(g2d);
+        drawDebugText(g2d);
+    }
+
+    private void drawDebugText(GraphicsContext g2d) {
+        if (!DEBUG)
+            return;
         g2d.fillText(graphArea.toString(), graphArea.left, graphArea.top + 18d);
         g2d.fillText(zeroPoint.toString(), graphArea.left, graphArea.top + 36d);
+        g2d.fillText(scaleXY.toString(), graphArea.left, graphArea.top + 54d);
+    }
+
+    private void drawZeroPoint(GraphicsContext g2d) {
+        g2d.strokeOval(zeroPoint.x - 2, zeroPoint.y - 2, 4, 4);
+//        g2d.strokeLine(zeroPoint.x - 3, zeroPoint.y, zeroPoint.x + 3, zeroPoint.y);
+//        g2d.strokeLine(zeroPoint.x, zeroPoint.y - 3, zeroPoint.x, zeroPoint.y + 3);
+//        g2d.strokeLine(zeroPoint.x - 2, zeroPoint.y - 2, zeroPoint.x + 2, zeroPoint.y + 2);
+//        g2d.strokeLine(zeroPoint.x + 2, zeroPoint.y - 2, zeroPoint.x - 2, zeroPoint.y + 2);
+    }
+
+    private void drawZeroPointLine(GraphicsContext g2d) {
+        g2d.strokeLine(graphArea.left, zeroPoint.y, graphArea.right, zeroPoint.y);
+        g2d.strokeLine(zeroPoint.x, graphArea.top, zeroPoint.x, graphArea.bottom);
+    }
+
+    private void drawFrame(GraphicsContext g2d) {
+        g2d.strokeRect(graphArea.left, graphArea.top, graphArea.getAbsWidth(), graphArea.getHeight());
+    }
+
+    /**
+     * 确认3x2的2d衍射变换矩阵，用作逻辑值和显示值的映射
+     * 每次绘制用户内容前调用
+     *
+     * @param g2d
+     */
+    public void applyTransform(GraphicsContext g2d) {
+        double[][] transform = new double[2][3];
+        transform[0][0] = scaleXY.x;
+        transform[1][1] = scaleXY.y;
+        transform[0][2] = zeroPoint.x;
+        transform[1][2] = -zeroPoint.y;
+        g2d.transform(transform[0][0],
+                transform[1][0],
+                transform[0][1],
+                transform[1][1],
+                transform[0][2],
+                transform[1][2]);
     }
 }

@@ -1,23 +1,20 @@
 package com.sth99.stockviewer.gui;
 
-import com.sth99.stockviewer.data.KData;
+import com.sth99.stockviewer.data.KDataSet;
 import com.sth99.stockviewer.data.KDataTimeLength;
 import com.sth99.stockviewer.data.StockCodeData;
 import com.sth99.stockviewer.data.StockCodeStorager;
+import com.sth99.stockviewer.gui.component.KChart;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import sun.security.krb5.KdcComm;
 
 import java.net.URL;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
@@ -47,6 +44,7 @@ public class Controller implements Initializable {
 
     StockCodeStorager stockCodeStorager;
     StockCodeData currentStockCode;
+    KDataSet kDataSet;
     double frameWidth, frameHeight;
     private long lastPropertyCahngeTiming = 0;
 
@@ -58,12 +56,12 @@ public class Controller implements Initializable {
 
     private void reLayout() {
         //check width and height has both changed
-        if (System.currentTimeMillis() - lastPropertyCahngeTiming < 5)
-            return;
-        lastPropertyCahngeTiming = System.currentTimeMillis();
-
+        if (frameWidth < 1200d)
+            frameWidth = 1200d;
+        if (frameHeight < 800d)
+            frameHeight = 800d;
         stockListBorderPane.setPrefSize(200d, (frameHeight - 200d) / 2d - TITLEDPANE_HEADER_HEIGHT);
-        selfChosenPane.setPrefSize(200d, (frameHeight - 200d) / 2d - TITLEDPANE_HEADER_HEIGHT);
+        selfChosenPane.setPrefSize(200d, (frameHeight - 200d) / 2d - TITLEDPANE_HEADER_HEIGHT - 2);
         mainCanvas.setCanvasWidth(frameWidth - 400d);
         mainCanvas.setCanvasHeight(frameHeight - 200d);
         updateCanvas();
@@ -79,9 +77,9 @@ public class Controller implements Initializable {
         if (currentStockCode == null)
             return;
         try {
-            KData kData = new KData(currentStockCode, KDataTimeLength.daily);
+            kDataSet = new KDataSet(currentStockCode, KDataTimeLength.daily);
             consoleTextArea.clear();
-            consoleTextArea.appendText(kData.getFilteredData());
+            consoleTextArea.appendText(kDataSet.getKDataList().size() + "\n");
             consoleTextArea.appendText(currentStockCode.getFullCode() + "\n");
         } catch (Exception e) {
             e.printStackTrace();
@@ -90,6 +88,11 @@ public class Controller implements Initializable {
 
     private void updateCanvas() {
         mainCanvas.clear();
+        if (kDataSet != null) {
+            KChart kChart = new KChart(kDataSet);
+            mainCanvas.drawObject(kChart);
+            System.out.println("KCdraw called");
+        }
     }
 
     private void createAbsAnchor(AnchorPane pane, Node child, double up, double left, double right, double down) {
@@ -122,10 +125,8 @@ public class Controller implements Initializable {
      */
     public Runnable initializer = () -> {
         //Main Pane Initialize
-        frameWidth = mainPane.getWidth();
-        frameHeight = mainPane.getHeight();
-        mainPane.widthProperty().addListener(widthResizeListener);
-        mainPane.heightProperty().addListener(heightResizeListener);
+        frameWidth = 1200d;
+        frameHeight = 800d;
 
         //Bottom Area Initialize
         consoleTextArea = new TextArea("test");
@@ -137,9 +138,13 @@ public class Controller implements Initializable {
         consolePane.setRightAnchor(consoleTextField, 0d);
 
         //Center Area Initialize
-        mainCanvas = new StockCanvas(128d, 128d);
+        mainCanvas = new StockCanvas(frameWidth - 400d, frameHeight - 200d);
         mainAnchorPane.getChildren().add(mainCanvas);
         createAbsAnchor(mainAnchorPane, mainCanvas, 0d, 0d, 0d, 0d);
+
+        //Main Pane Listener
+        mainPane.widthProperty().addListener(widthResizeListener);
+        mainPane.heightProperty().addListener(heightResizeListener);
     };
     /**
      * 后初始化器，包含网络操作，这个时候先显示界面。后初始化放在与initialize不同的线程。

@@ -1,6 +1,6 @@
 package com.sth99.stockviewer.gui.component;
 
-import com.sth99.stockviewer.util.MathAdv;
+import com.sth99.stockviewer.util.MathUtil;
 
 /**
  * 简单的点模型
@@ -27,7 +27,7 @@ public class Point {
     }
 
     public double getDistance(Point p) {
-        return Math.sqrt(MathAdv.pow(x - p.x, 2) + MathAdv.pow(y - p.y, 2));
+        return Math.sqrt(MathUtil.pow(x - p.x, 2) + MathUtil.pow(y - p.y, 2));
     }
 
     public Point translate(Point p) {
