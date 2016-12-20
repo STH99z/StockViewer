@@ -1,6 +1,7 @@
 package com.sth99.stockviewer.gui.component;
 
 import com.sth99.stockviewer.data.KData;
+import com.sth99.stockviewer.util.MathUtil;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -12,8 +13,8 @@ public class Candle implements IDrawable {
     double open, close, highest, lowest;
     double x;
     static Color strokeColor = Color.color(0d, 0d, 0d);
-    static Color riseColor = Color.color(.8d, 0d, 0d);
-    static Color dropColor = Color.color(0d, .8d, 0d);
+    static Color riseColor = MathUtil.getColor(217, 26, 42);
+    static Color dropColor = MathUtil.getColor(23, 166, 58);
 
     public Candle(double open, double close, double highest, double lowest, double x) {
         this.open = open;
@@ -38,21 +39,12 @@ public class Candle implements IDrawable {
 
     @Override
     public void draw(GraphicsContext g2d, CoordinateSystem system) {
-        double o, c, h, l, x;
-        x = system.locateX(this.x);
-        o = system.locateY(open);
-        c = system.locateY(close);
-        h = system.locateY(highest);
-        l = system.locateY(lowest);
-        g2d.setStroke(strokeColor);
-        g2d.strokeLine(x, h, x, l);
-        System.out.println(open + " " + close);
-        if (open > close) {
+        if (open < close) {
             g2d.setFill(riseColor);
-            g2d.fillRect(x - 3, o, 5, c - o);
-        } else if (open < close) {
+        } else if (open > close) {
             g2d.setFill(dropColor);
-            g2d.fillRect(x - 3, c, 5, o - c);
         }
+        system.fillRect(g2d, x - 0.4, open, x + 0.4, close);
+        system.drawVLine(g2d, x, highest, lowest);
     }
 }

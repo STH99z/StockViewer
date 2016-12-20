@@ -1,9 +1,6 @@
 package com.sth99.stockviewer.data;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.regex.Matcher;
@@ -19,6 +16,8 @@ public class WebData extends Data {
     BufferedReader bufferedReader;
     StringBuffer stringBuffer;
     String charsetName = "utf-8";
+    boolean isGetCalled = false;
+    String result = "";
 
     public WebData(URL url) {
         this.url = url;
@@ -33,6 +32,8 @@ public class WebData extends Data {
     }
 
     public String getData() {
+        if (isGetCalled)
+            return result;
         try {
             if (stringBuffer == null) {
                 inputStreamReader = new InputStreamReader(url.openStream(), charsetName);
@@ -45,22 +46,32 @@ public class WebData extends Data {
                     stringBuffer.append((char) read);
                 }
                 bufferedReader.close();
+                result = stringBuffer.toString();
+                if (result.length() == 0) {
+                    System.out.println("网络文件长度为0");
+                }
             }
         } catch (FileNotFoundException fnfe) {
             System.out.println("网络文件未找到");
             stringBuffer = new StringBuffer();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
             stringBuffer = new StringBuffer();
         } finally {
-
+            isGetCalled = true;
         }
-        return stringBuffer.toString();
+        return result;
     }
 
     public Matcher filterData(String regex) throws IOException {
         Pattern pattern = Pattern.compile(regex);
         return pattern.matcher(getData());
+    }
+
+    public void saveData(String fileName) throws IOException {
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName));
+        bufferedWriter.write(getData());
+        bufferedWriter.close();
     }
 
     @Override

@@ -7,6 +7,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.SceneAntialiasing;
 import javafx.stage.Stage;
 
 import java.util.function.Consumer;
@@ -19,7 +20,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("mainWindow.fxml"));
         primaryStage.setTitle("STOCK VIEWER");
-        primaryStage.setScene(new Scene(root, 1200, 800));
+        primaryStage.setScene(new Scene(root, 1200, 800, false, SceneAntialiasing.DISABLED));
         new Thread(controller.postInitializer).start();
         primaryStage.show();
     }

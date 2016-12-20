@@ -1,5 +1,7 @@
 package com.sth99.stockviewer.util;
 
+import javafx.scene.paint.Color;
+
 import java.util.Date;
 
 /**
@@ -50,5 +52,13 @@ public class MathUtil {
 
     public static double limitMax(double value, double max) {
         return value < max ? value : max;
+    }
+
+    public static Color getColor(int r, int g, int b) {
+        return Color.color(r / 255d, g / 255d, b / 255d);
+    }
+
+    public static Color getColor(double r, double g, double b) {
+        return Color.color(r, g, b);
     }
 }

@@ -4,6 +4,7 @@ import com.sth99.stockviewer.data.KDataSet;
 import com.sth99.stockviewer.data.KDataTimeLength;
 import com.sth99.stockviewer.data.StockCodeData;
 import com.sth99.stockviewer.data.StockCodeStorager;
+import com.sth99.stockviewer.gui.component.CoordinateSystem;
 import com.sth99.stockviewer.gui.component.KChart;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -46,7 +47,6 @@ public class Controller implements Initializable {
     StockCodeData currentStockCode;
     KDataSet kDataSet;
     double frameWidth, frameHeight;
-    private long lastPropertyCahngeTiming = 0;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -64,6 +64,7 @@ public class Controller implements Initializable {
         selfChosenPane.setPrefSize(200d, (frameHeight - 200d) / 2d - TITLEDPANE_HEADER_HEIGHT - 2);
         mainCanvas.setCanvasWidth(frameWidth - 400d);
         mainCanvas.setCanvasHeight(frameHeight - 200d);
+        mainCanvas.updateCoordinateSystem();
         updateCanvas();
     }
 
@@ -91,7 +92,6 @@ public class Controller implements Initializable {
         if (kDataSet != null) {
             KChart kChart = new KChart(kDataSet);
             mainCanvas.drawObject(kChart);
-            System.out.println("KCdraw called");
         }
     }
 

@@ -17,7 +17,7 @@ public class KChart extends Chart implements IDrawable {
     public KChart(ArrayList<KData> kDataList) {
         this.kDataList = kDataList;
         candles = new ArrayList<>(kDataList.size());
-        xStart = 0d;
+        xStart = -1;
         xEnd = (double) kDataList.size();
         yStart = kDataList.get(0).lowest;
         yEnd = kDataList.get(0).highest;
