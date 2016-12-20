@@ -121,20 +121,6 @@ public class CoordinateSystem implements IDrawable {
         g2d.fillRect((int) graphArea.left, (int) graphArea.top, (int) graphArea.getAbsWidth(), 1);
         g2d.fillRect((int) graphArea.right, (int) graphArea.top, 1, (int) graphArea.getAbsHeight());
         g2d.fillRect((int) graphArea.left, (int) graphArea.bottom, (int) graphArea.getAbsWidth(), 1);
-        for (double x = graphArea.left; x < graphArea.right; x += 50) {
-            g2d.setFill(backgroundLineColor);
-            g2d.fillRect((int) x, (int) graphArea.top, 1, (int) graphArea.getAbsHeight());
-            g2d.setFill(backgroundTextColor);
-            g2d.fillText(String.format("%.2f", retriveX(x)), x, graphArea.bottom + 12);
-        }
-        for (double y = graphArea.top; y < graphArea.bottom; y += 20) {
-            g2d.setFill(backgroundLineColor);
-            g2d.fillRect((int) graphArea.left, (int) y, (int) graphArea.getAbsWidth(), 1);
-            g2d.setFill(backgroundTextColor);
-            g2d.fillText(String.format("%.2f", retriveY(y)), graphArea.left - 32, y + 6);
-        }
-        g2d.setFill(backgroundTextColor);
-        //TODO add label drawing
     }
 
     /**

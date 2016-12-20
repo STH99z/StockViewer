@@ -39,11 +39,41 @@ public class KChart extends Chart implements IDrawable {
     public void draw(GraphicsContext g2d, CoordinateSystem system) {
         locateChart(system, xStart, xEnd, yStart, yEnd);
         system.draw(g2d, null);
+        drawChartBackground(g2d, system);
         drawCheck();
         for (Candle candle : candles) {
             candle.draw(g2d, system);
         }
     }
 
-
+    @Override
+    void drawChartBackground(GraphicsContext g2d, CoordinateSystem system) {
+        for (double x = system.graphArea.left; x <= system.graphArea.right; x += 80) {
+            g2d.setFill(system.backgroundLineColor);
+            g2d.fillRect((int) x, (int) system.graphArea.top, 1, (int) system.graphArea.getAbsHeight());
+            g2d.setFill(system.backgroundTextColor);
+            KData kData = null;
+            try {
+                kData = kDataList.get((int) system.retriveX(x));
+                String text = String.format("%02d/%02d/%02d", kData.year, kData.month, kData.day);
+                g2d.fillText(text, x, system.graphArea.bottom + 12);
+            } catch (IndexOutOfBoundsException e) {
+                int ei=(int) system.retriveX(x);
+                if(ei!=-1)
+                    System.out.println();
+                else{
+                    kData = kDataList.get(0);
+                    String text = String.format("%02d/%02d/%02d", kData.year, kData.month, kData.day);
+                    g2d.fillText(text, x, system.graphArea.bottom + 12);
+                }
+            }
+        }
+        for (double y = system.graphArea.top; y <= system.graphArea.bottom; y += 20) {
+            g2d.setFill(system.backgroundLineColor);
+            g2d.fillRect((int) system.graphArea.left, (int) y, (int) system.graphArea.getAbsWidth(), 1);
+            g2d.setFill(system.backgroundTextColor);
+            g2d.fillText(String.format("%.2f", system.retriveY(y)), system.graphArea.left - 35, y + 6);
+        }
+    }
+    //TODO labels and mouseLocateLine
 }

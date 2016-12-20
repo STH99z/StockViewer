@@ -63,7 +63,7 @@ public class Controller implements Initializable {
         stockListBorderPane.setPrefSize(200d, (frameHeight - 200d) / 2d - TITLEDPANE_HEADER_HEIGHT);
         selfChosenPane.setPrefSize(200d, (frameHeight - 200d) / 2d - TITLEDPANE_HEADER_HEIGHT - 2);
         mainCanvas.setCanvasWidth(frameWidth - 400d);
-        mainCanvas.setCanvasHeight(frameHeight - 200d);
+        mainCanvas.setCanvasHeight(frameHeight - 229);
         mainCanvas.updateCoordinateSystem();
         updateCanvas();
     }
@@ -112,10 +112,14 @@ public class Controller implements Initializable {
         updateCanvas();
     };
     private ChangeListener<Number> widthResizeListener = (observable, oldValue, newValue) -> {
+        if (frameWidth == 1200d && newValue.doubleValue() < 1200)
+            return;
         frameWidth = newValue.doubleValue();
         reLayout();
     };
     private ChangeListener<Number> heightResizeListener = (observable, oldValue, newValue) -> {
+        if (frameHeight == 800d && newValue.doubleValue() < 800)
+            return;
         frameHeight = newValue.doubleValue();
         reLayout();
     };
@@ -138,7 +142,7 @@ public class Controller implements Initializable {
         consolePane.setRightAnchor(consoleTextField, 0d);
 
         //Center Area Initialize
-        mainCanvas = new StockCanvas(frameWidth - 400d, frameHeight - 200d);
+        mainCanvas = new StockCanvas(frameWidth - 400d, frameHeight - 229d);
         mainAnchorPane.getChildren().add(mainCanvas);
         createAbsAnchor(mainAnchorPane, mainCanvas, 0d, 0d, 0d, 0d);
 
@@ -153,6 +157,9 @@ public class Controller implements Initializable {
         stockCodeStorager = new StockCodeStorager();
         stockListField.textProperty().addListener(codeFieldChangeListener);
         stockListView.getSelectionModel().selectedItemProperty().addListener(codeListSelectListener);
-        updateCodeListView();
+        currentStockCode = new StockCodeData("", "sh600000");
+        stockListField.setText("600");
+//        updateCodeListView();
+        stockListView.getSelectionModel().select(0);
     };
 }
