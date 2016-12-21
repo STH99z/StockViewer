@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="mainPane" maxHeight="Infinity" maxWidth="Infinity" minHeight="800" minWidth="1200" prefHeight="800" prefWidth="1200" xmlns="http://javafx.com/javafx/8.0.102" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sth99.stockviewer.gui.Controller">
+<BorderPane fx:id="mainPane" maxHeight="Infinity" maxWidth="Infinity" minHeight="800" minWidth="1200" prefHeight="800" prefWidth="1200" xmlns="http://javafx.com/javafx/8.0.102" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sth99.stockviewer.gui.MainController">
     <center>
         <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
             <tabs>

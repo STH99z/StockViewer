@@ -1,10 +1,6 @@
 package com.sth99.stockviewer.gui;
 
-import com.sth99.stockviewer.data.KDataSet;
-import com.sth99.stockviewer.data.KDataTimeLength;
-import com.sth99.stockviewer.data.StockCodeData;
-import com.sth99.stockviewer.data.StockCodeStorager;
-import com.sth99.stockviewer.gui.component.CoordinateSystem;
+import com.sth99.stockviewer.data.*;
 import com.sth99.stockviewer.gui.component.KChart;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -15,10 +11,12 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class Controller implements Initializable {
+public class MainController implements Initializable, ControlledStage {
+    private StageController stageController;
     @FXML
     private BorderPane mainPane;
     @FXML
@@ -42,6 +40,12 @@ public class Controller implements Initializable {
     private StockCanvas mainCanvas;
 
     private static final double TITLEDPANE_HEADER_HEIGHT = 22d;
+    private static final String TODO_STRING = "" +
+            "用户登录：单出一个界面来，在显示主界面之前显示。登录之前不显示主界面\n" +
+            "Global数据类，大部分public static，里边有UserSettings。\n" +
+            "多个画布和更多数据图表\n" +
+            "右侧部分完成\n" +
+            "下侧部分用图表代替\n";
 
     StockCodeStorager stockCodeStorager;
     StockCodeData currentStockCode;
@@ -50,7 +54,6 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        Main.controller = this;
         initializer.run();
     }
 
@@ -79,9 +82,8 @@ public class Controller implements Initializable {
             return;
         try {
             kDataSet = new KDataSet(currentStockCode, KDataTimeLength.daily);
-            consoleTextArea.clear();
-            consoleTextArea.appendText(kDataSet.getKDataList().size() + "\n");
-            consoleTextArea.appendText(currentStockCode.getFullCode() + "\n");
+            consoleTextArea.appendText("kDataSet.getKDataList().size()=" + kDataSet.getKDataList().size() + "\n");
+            consoleTextArea.appendText("currentStockCode.getFullCode()=" + currentStockCode.getFullCode() + "\n");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -125,15 +127,33 @@ public class Controller implements Initializable {
     };
 
     /**
+     * 后初始化器，包含网络操作，这个时候先显示界面。后初始化放在与initialize不同的线程。
+     */
+    public Runnable postInitializer = () -> {
+        stockCodeStorager = new StockCodeStorager();
+        stockListField.textProperty().addListener(codeFieldChangeListener);
+        stockListView.getSelectionModel().selectedItemProperty().addListener(codeListSelectListener);
+        currentStockCode = new StockCodeData("", "sh600000");
+        stockListField.setText("600");
+//        updateCodeListView();
+        stockListView.getSelectionModel().select(0);
+    };
+    /**
      * 初始化器，在initialize中调用（同线程）。
      */
     public Runnable initializer = () -> {
-        //Main Pane Initialize
+        //MainApp Pane Initialize
         frameWidth = 1200d;
         frameHeight = 800d;
 
         //Bottom Area Initialize
-        consoleTextArea = new TextArea("test");
+        consoleTextArea = new TextArea(TODO_STRING);
+        try {
+            consoleTextArea.appendText(new String(new ColorData(100, 200, 100).toByteData()));
+            consoleTextArea.appendText("\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         consoleTextField = new TextField("console in");
         consolePane.getChildren().addAll(consoleTextArea, consoleTextField);
         createAbsAnchor(consolePane, consoleTextArea, 0d, 0d, 0d, 23d);
@@ -146,20 +166,15 @@ public class Controller implements Initializable {
         mainAnchorPane.getChildren().add(mainCanvas);
         createAbsAnchor(mainAnchorPane, mainCanvas, 0d, 0d, 0d, 0d);
 
-        //Main Pane Listener
+        //MainApp Pane Listener
         mainPane.widthProperty().addListener(widthResizeListener);
         mainPane.heightProperty().addListener(heightResizeListener);
+
+        new Thread(postInitializer).start();
     };
-    /**
-     * 后初始化器，包含网络操作，这个时候先显示界面。后初始化放在与initialize不同的线程。
-     */
-    public Runnable postInitializer = () -> {
-        stockCodeStorager = new StockCodeStorager();
-        stockListField.textProperty().addListener(codeFieldChangeListener);
-        stockListView.getSelectionModel().selectedItemProperty().addListener(codeListSelectListener);
-        currentStockCode = new StockCodeData("", "sh600000");
-        stockListField.setText("600");
-//        updateCodeListView();
-        stockListView.getSelectionModel().select(0);
-    };
+
+    @Override
+    public void setStageController(StageController stageController) {
+        this.stageController = stageController;
+    }
 }
