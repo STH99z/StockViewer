@@ -10,6 +10,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
@@ -125,6 +126,11 @@ public class MainController implements Initializable, ControlledStage {
         frameHeight = newValue.doubleValue();
         reLayout();
     };
+
+    @Override
+    public void setShowingChangeListener(Stage stage) {
+        //do nothing
+    }
 
     /**
      * 后初始化器，包含网络操作，这个时候先显示界面。后初始化放在与initialize不同的线程。

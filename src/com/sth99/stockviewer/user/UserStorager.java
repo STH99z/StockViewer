@@ -13,6 +13,16 @@ public class UserStorager {
         return singleInstance;
     }
 
+    public User getCurrentUser() {
+        return currentUser;
+    }
+
+    private User currentUser = null;
+
+    public void setCurrentUser(User user) {
+        currentUser = user;
+    }
+
     private static UserStorager singleInstance = new UserStorager();
 
     private Hashtable<Long, User> table;
@@ -46,6 +56,14 @@ public class UserStorager {
 
     public User get(long uid) {
         return table.get(uid);
+    }
+
+    public User get(String userName) {
+        for (User user : table.values()) {
+            if (userName.equals(user.getUserName()))
+                return user;
+        }
+        return null;
     }
 
     public void readFromFile(String file) {

@@ -50,10 +50,10 @@
               </rowConstraints>
                <children>
                   <Button fx:id="loginButton" mnemonicParsing="false" prefWidth="48.0" text="登录" GridPane.halignment="CENTER" GridPane.valignment="BOTTOM" />
-                  <Button fx:id="RegisterButton" mnemonicParsing="false" prefWidth="48.0" text="注册" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="BOTTOM" />
+                  <Button fx:id="registerButton" mnemonicParsing="false" prefWidth="48.0" text="注册" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="BOTTOM" />
                </children>
             </GridPane>
-            <Label fx:id="tipLabel" text=" " textFill="RED" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+            <Label fx:id="tipLabel" text=" " textFill="RED" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
             </children>
         </GridPane>
     </center>

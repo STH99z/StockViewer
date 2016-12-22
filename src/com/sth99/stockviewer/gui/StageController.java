@@ -78,6 +78,9 @@ public class StageController {
                 tempStage.initStyle(style);
             }
 
+            //added by STH99 on 2016-12-22
+            controlledStage.setShowingChangeListener(tempStage);
+
             //将设置好的Stage放到HashMap中
             this.addStage(name, tempStage);
 
