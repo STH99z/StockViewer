@@ -89,6 +89,7 @@ public class LoginStageController implements Initializable, ControlledStage {
         try {
             registerButton.setOnAction(regiterButtonHandler);
             loginButton.setOnAction(loginButtonHandler);
+            UserStorager.get().readFromFile("users.dat");
         } catch (Exception e) {
             e.printStackTrace();
         }

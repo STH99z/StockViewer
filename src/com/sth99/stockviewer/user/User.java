@@ -2,6 +2,7 @@ package com.sth99.stockviewer.user;
 
 import com.sth99.stockviewer.util.MathUtil;
 
+import java.lang.reflect.Array;
 import java.util.regex.Pattern;
 
 /**
@@ -88,5 +89,14 @@ public class User {
 
     public String toSaveData() {
         return MathUtil.base64Encode(uid + ";" + userName + ";" + password);
+    }
+
+    public byte[] toSaveBytes() {
+        String save = toSaveData();
+        int len = save.length();
+        byte[] bytes = new byte[len + 4];
+        System.arraycopy(save.getBytes(), 0, bytes, 4, len);
+        System.arraycopy(MathUtil.int2Byte(len), 0, bytes, 0, 4);
+        return bytes;
     }
 }

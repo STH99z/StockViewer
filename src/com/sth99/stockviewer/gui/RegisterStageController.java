@@ -14,6 +14,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -66,7 +67,11 @@ public class RegisterStageController implements Initializable, ControlledStage {
         userStorager.register(userNameField.getText(), passwordField.getText());
         tipLabel.setTextFill(Color.BLACK);
         tipLabel.setText(REGISTER_OK);
-        userStorager.saveToFile("users.dat");
+        try {
+            userStorager.saveToFile("users.dat");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     };
 
     private ChangeListener<String> userNameChangeListener = (observable, oldValue, newValue) -> {

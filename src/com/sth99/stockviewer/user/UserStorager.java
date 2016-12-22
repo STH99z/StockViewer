@@ -1,5 +1,12 @@
 package com.sth99.stockviewer.user;
 
+import com.sth99.stockviewer.util.MathUtil;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -66,11 +73,30 @@ public class UserStorager {
         return null;
     }
 
-    public void readFromFile(String file) {
+    public void readFromFile(String file) throws IOException, Exception {
+        table.clear();
+        FileInputStream fileInputStream = new FileInputStream(file);
+        byte[] countBytes = new byte[4];
+        fileInputStream.read(countBytes);
+        int count = MathUtil.byte2Int(countBytes);
+        for (int i = 0; i < count; i++) {
+            byte[] sizeBytes = new byte[4];
+            int size = MathUtil.byte2Int(sizeBytes);
+            byte[] userBytes = new byte[size];
+            fileInputStream.read(userBytes);
+            String userData = new String(userBytes);
+            User user = new User(userData);
+            table.put(user.getUid(), user);
+        }
 
     }
 
-    public void saveToFile(String file) {
-
+    public void saveToFile(String file) throws IOException {
+        FileOutputStream fileOutputStream = new FileOutputStream(file);
+        fileOutputStream.write(MathUtil.int2Byte(table.values().size()));
+        for (User user : table.values()) {
+            fileOutputStream.write(user.toSaveBytes());
+        }
+        fileOutputStream.close();
     }
 }

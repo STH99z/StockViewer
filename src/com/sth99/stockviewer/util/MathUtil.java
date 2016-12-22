@@ -76,6 +76,24 @@ public class MathUtil {
         return new String(Base64.getDecoder().decode(string));
     }
 
+    public static byte[] int2Byte(int i) {
+        byte[] bytes = new byte[4];
+        for (int j = 0; j < 4; j++) {
+            bytes[i] = ((byte) ((i & (0xff << (i * 8))) >> (i * 8)));
+        }
+        return bytes;
+    }
+
+    public static int byte2Int(byte[] bytes) {
+        if (bytes.length != 4)
+            return 0;
+        int result = 0;
+        for (int i = 0; i < 4; i++) {
+            result += ((int) (bytes[i] << (i * 8)));
+        }
+        return result;
+    }
+
 //    @TEST
 //    public static void main(String[] args) {
 //        String result = base64Encode("asdjklasdjkl12389");
