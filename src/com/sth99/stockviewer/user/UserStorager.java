@@ -47,4 +47,12 @@ public class UserStorager {
     public User get(long uid) {
         return table.get(uid);
     }
+
+    public void readFromFile(String file) {
+
+    }
+
+    public void saveToFile(String file) {
+
+    }
 }

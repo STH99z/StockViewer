@@ -13,6 +13,9 @@ public class MainApp extends Application {
     public static String mainViewRes = "mainWindow.fxml";
     public static String loginViewID = "loginWindow";
     public static String loginViewRes = "loginWindow.fxml";
+    public static String registerViewID = "registerWindow";
+    public static String registerViewRes = "registerWindow.fxml";
+
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -29,12 +32,16 @@ public class MainApp extends Application {
 
         stageController.loadStage(loginViewID, loginViewRes);
         stageController.loadStage(mainViewID, mainViewRes);
+        stageController.loadStage(registerViewID, registerViewRes);
 
-        stageController.getStage(loginViewID).setTitle("Login");
+        stageController.getStage(loginViewID).setTitle("登录");
         stageController.getStage(loginViewID).setResizable(false);
+        stageController.getStage(registerViewID).setTitle("注册");
+        stageController.getStage(registerViewID).setResizable(false);
         stageController.getStage(mainViewID).setTitle("STOCK VIEWER");
 
         stageController.setStage(loginViewID);
+//        stageController.setStage(mainViewID);
     }
 
     public static void main(String[] args) {
