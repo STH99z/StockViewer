@@ -21,7 +21,7 @@ public class UserStorager {
         return currentUser;
     }
 
-    private User currentUser = null;
+    private User currentUser = new User("临时用户", "");
 
     public void setCurrentUser(User user) {
         currentUser = user;

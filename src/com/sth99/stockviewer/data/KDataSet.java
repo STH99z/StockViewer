@@ -11,13 +11,8 @@ import java.util.regex.Pattern;
  * Created by STH99 on 2016/12/15.
  */
 public class KDataSet extends WebData {
-    ////fixme 需要一个factory？
     private static final String dataFilterPat = "(\\d{2})(\\d{2})(\\d{2}) ([0-9.]+) ([0-9.]+) ([0-9.]+) ([0-9.]+) (\\d+)\\\\n\\\\";
     static final String[] dataFilterTag = {"", "y", "m", "d", "open", "close", "highest", "lowest", "???"};
-    static final int GROUP_OPEN = 4;
-    static final int GROUP_CLOSE = 5;
-    static final int GROUP_HIGHEST = 6;
-    static final int GROUP_LOWEST = 7;
     static final int maxAge = 43200;
 
     static final Pattern dataFilter = Pattern.compile(dataFilterPat);

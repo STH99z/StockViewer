@@ -44,7 +44,7 @@ public class StockCanvas extends Canvas {
         canvasWidth = width;
         canvasHeight = height;
         Rectangle graphArea = new Rectangle(margin, margin, canvasWidth - margin, canvasHeight - margin);
-        System.out.println(graphArea);
+//        System.out.println(graphArea);
         setCoordinateSystem(new CoordinateSystem(graphArea));
     }
 
@@ -70,17 +70,13 @@ public class StockCanvas extends Canvas {
         g2d = getG2d();
         g2d.setFill(Color.WHITE);
         g2d.fillRect(0d, 0d, getWidth(), getHeight());
-        drawTest();
+        g2d.setFill(textColor);
+        g2d.setFont(Font.font("Consolas", 12));
+        g2d.setFontSmoothingType(null);
     }
 
     public void drawObject(IDrawable drawable) {
         drawable.draw(g2d, coordinateSystem);
     }
 
-    private void drawTest() {
-        g2d.setFill(textColor);
-        g2d.setFont(Font.font("Consolas", 12));
-        g2d.setFontSmoothingType(null);
-        g2d.fillText("w=" + canvasWidth + " h=" + canvasHeight, 0d, 12d);
-    }
 }

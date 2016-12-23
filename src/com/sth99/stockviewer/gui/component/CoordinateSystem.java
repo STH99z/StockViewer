@@ -1,6 +1,7 @@
 package com.sth99.stockviewer.gui.component;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.PixelWriter;
 import javafx.scene.paint.Color;
 
 /**
@@ -8,7 +9,7 @@ import javafx.scene.paint.Color;
  * Created by STH99 on 2016/12/17.
  */
 public class CoordinateSystem implements IDrawable {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     Rectangle graphArea;
     /**
@@ -160,6 +161,15 @@ public class CoordinateSystem implements IDrawable {
         int m = ix1 < ix2 ? ix1 : ix2;
         int w = Math.abs(ix1 - ix2);
         g2d.fillRect(m, iy, w, 1);
+    }
+
+    public void drawLine(GraphicsContext g2d, double x1, double y1, double x2, double y2) {
+        int ix1 = (int) locateX(x1);
+        int ix2 = (int) locateX(x2);
+        int iy1 = (int) locateY(y1);
+        int iy2 = (int) locateY(y2);
+        g2d.setStroke(g2d.getFill());
+        g2d.strokeLine(ix1, iy1, ix2, iy2);
     }
 
     public void fillRect(GraphicsContext g2d, double x1, double y1, double x2, double y2) {

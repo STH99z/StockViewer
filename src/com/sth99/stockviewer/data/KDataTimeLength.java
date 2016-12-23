@@ -35,9 +35,9 @@ public enum KDataTimeLength {
         switch (this) {
             case daily:
                 return "http://data.gtimg.cn/flashdata/hushen/latest/daily/";
-            case monthly:
-                return "http://data.gtimg.cn/flashdata/hushen/latest/weekly/";
             case weekly:
+                return "http://data.gtimg.cn/flashdata/hushen/latest/weekly/";
+            case monthly:
                 return "http://data.gtimg.cn/flashdata/hushen/monthly/";
         }
         return "";
