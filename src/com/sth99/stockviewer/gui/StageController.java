@@ -15,6 +15,8 @@ import java.util.HashMap;
 public class StageController {
     //建立一个专门存储Stage的Map，全部用于存放Stage对象
     private HashMap<String, Stage> stages = new HashMap<String, Stage>();
+    //added by STH99 on 2016-12-22
+    private HashMap<String, Scene> scenes = new HashMap<>();
 
 
     /**
@@ -27,6 +29,10 @@ public class StageController {
         stages.put(name, stage);
     }
 
+    public void addScene(String name, Scene scene) {
+        scenes.put(name, scene);
+    }
+
 
     /**
      * 通过Stage名称获取Stage对象
@@ -36,6 +42,10 @@ public class StageController {
      */
     public Stage getStage(String name) {
         return stages.get(name);
+    }
+
+    public Scene getScene(String name) {
+        return scenes.get(name);
     }
 
 
@@ -83,6 +93,7 @@ public class StageController {
 
             //将设置好的Stage放到HashMap中
             this.addStage(name, tempStage);
+            this.addScene(name, tempScene);
 
             return true;
         } catch (Exception e) {

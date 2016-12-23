@@ -79,7 +79,7 @@ public class MathUtil {
     public static byte[] int2Byte(int i) {
         byte[] bytes = new byte[4];
         for (int j = 0; j < 4; j++) {
-            bytes[i] = ((byte) ((i & (0xff << (i * 8))) >> (i * 8)));
+            bytes[3 - j] = ((byte) ((i & (0xff << (j * 8))) >> (j * 8)));
         }
         return bytes;
     }
@@ -89,7 +89,7 @@ public class MathUtil {
             return 0;
         int result = 0;
         for (int i = 0; i < 4; i++) {
-            result += ((int) (bytes[i] << (i * 8)));
+            result += ((int) (bytes[3 - i] << (i * 8)));
         }
         return result;
     }

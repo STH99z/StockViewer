@@ -93,9 +93,10 @@ public class User {
 
     public byte[] toSaveBytes() {
         String save = toSaveData();
-        int len = save.length();
+        byte[] bytes1 = save.getBytes();
+        int len = bytes1.length;
         byte[] bytes = new byte[len + 4];
-        System.arraycopy(save.getBytes(), 0, bytes, 4, len);
+        System.arraycopy(bytes1, 0, bytes, 4, len);
         System.arraycopy(MathUtil.int2Byte(len), 0, bytes, 0, 4);
         return bytes;
     }

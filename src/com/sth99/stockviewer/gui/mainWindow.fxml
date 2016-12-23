@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckMenuItem?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextField?>
@@ -18,12 +24,22 @@
     <center>
         <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
             <tabs>
-                <Tab text="K线图">
+                <Tab text="分时图">
+                    <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                    </content>
+                </Tab>
+                <Tab text="日K线图">
                     <content>
                         <AnchorPane fx:id="mainAnchorPane" prefHeight="200.0" prefWidth="200.0" />
                     </content>
                 </Tab>
-                <Tab text="Graph2">
+                <Tab text="周K线图">
+                    <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                    </content>
+                </Tab>
+                <Tab text="月K线图">
                     <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
                     </content>
@@ -64,6 +80,13 @@
                             <center>
                                 <ListView fx:id="stockListView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
                             </center>
+                            <bottom>
+                                <HBox alignment="CENTER_RIGHT" BorderPane.alignment="CENTER">
+                                    <children>
+                                        <Button mnemonicParsing="false" text="加入自选股" />
+                                    </children>
+                                </HBox>
+                            </bottom>
                         </BorderPane>
                     </content>
                 </TitledPane>
@@ -73,6 +96,13 @@
                             <center>
                                 <ListView prefHeight="256.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
                             </center>
+                            <bottom>
+                                <HBox alignment="CENTER_RIGHT" BorderPane.alignment="CENTER">
+                                    <children>
+                                        <Button mnemonicParsing="false" text="移除" />
+                                    </children>
+                                </HBox>
+                            </bottom>
                         </BorderPane>
                     </content>
                 </TitledPane>
@@ -89,4 +119,30 @@
             </rowConstraints>
         </GridPane>
     </right>
+    <top>
+        <MenuBar BorderPane.alignment="CENTER">
+            <menus>
+                <Menu mnemonicParsing="false" text="用户">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="设置" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem fx:id="uidMenu" mnemonicParsing="false" text="UID:" />
+                        <MenuItem fx:id="userNameMenu" mnemonicParsing="false" text="用户名:" />
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="数据">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="导出" />
+                        <CheckMenuItem mnemonicParsing="false" text="默认存储到本地" />
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="帮助">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="帮助" />
+                        <MenuItem mnemonicParsing="false" text="关于..." />
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+    </top>
 </BorderPane>

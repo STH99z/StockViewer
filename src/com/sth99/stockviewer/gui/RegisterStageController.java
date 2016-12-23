@@ -10,6 +10,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -102,6 +103,12 @@ public class RegisterStageController implements Initializable, ControlledStage {
         try {
             backButton.setOnAction(backButtonHandler);
             registerButton.setOnAction(registerButtonHandler);
+            registerButton.setOnKeyPressed(event -> {
+                if (event.getCode() == KeyCode.ENTER) registerButton.fire();
+            });
+            passwordAgainField.setOnKeyPressed(event -> {
+                if (event.getCode() == KeyCode.ENTER) registerButton.fire();
+            });
             userNameField.textProperty().addListener(userNameChangeListener);
         } catch (Exception e) {
             e.printStackTrace();

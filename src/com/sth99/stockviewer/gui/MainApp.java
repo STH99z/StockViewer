@@ -40,8 +40,13 @@ public class MainApp extends Application {
         stageController.getStage(registerViewID).setResizable(false);
         stageController.getStage(mainViewID).setTitle("STOCK VIEWER");
 
-        stageController.setStage(loginViewID);
-//        stageController.setStage(mainViewID);
+
+//        stageController.setStage(loginViewID);
+        stageController.setStage(mainViewID);
+    }
+
+    public String relatedPath(String path) {
+        return getClass().getResource(path).getFile();
     }
 
     public static void main(String[] args) {

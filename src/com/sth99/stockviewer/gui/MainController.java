@@ -2,6 +2,7 @@ package com.sth99.stockviewer.gui;
 
 import com.sth99.stockviewer.data.*;
 import com.sth99.stockviewer.gui.component.KChart;
+import com.sth99.stockviewer.user.UserStorager;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -17,7 +18,16 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class MainController implements Initializable, ControlledStage {
+    public static final double LIST_PREF_WIDTH = 200d;
+    public static final double LIST_SHRINK_HEIGHT = 225d;
+    private static final double TITLEDPANE_HEADER_HEIGHT = 22d;
+    public static final double CANVAS_SHRINK_WIDTH = 400d;
+    public static final int CANVAS_SHRINK_HEIGHT = 254;
+    public static final String UID_STIRNG = "UID:";
+    public static final String USERNAME_STRING = "用户名:";
     private StageController stageController;
+    @FXML
+    private MenuItem uidMenu, userNameMenu;
     @FXML
     private BorderPane mainPane;
     @FXML
@@ -40,7 +50,6 @@ public class MainController implements Initializable, ControlledStage {
     private AnchorPane mainAnchorPane;
     private StockCanvas mainCanvas;
 
-    private static final double TITLEDPANE_HEADER_HEIGHT = 22d;
     private static final String TODO_STRING = "" +
             "用户登录：单出一个界面来，在显示主界面之前显示。登录之前不显示主界面\n" +
             "Global数据类，大部分public static，里边有UserSettings。\n" +
@@ -64,10 +73,10 @@ public class MainController implements Initializable, ControlledStage {
             frameWidth = 1200d;
         if (frameHeight < 800d)
             frameHeight = 800d;
-        stockListBorderPane.setPrefSize(200d, (frameHeight - 200d) / 2d - TITLEDPANE_HEADER_HEIGHT);
-        selfChosenPane.setPrefSize(200d, (frameHeight - 200d) / 2d - TITLEDPANE_HEADER_HEIGHT - 2);
-        mainCanvas.setCanvasWidth(frameWidth - 400d);
-        mainCanvas.setCanvasHeight(frameHeight - 229);
+        stockListBorderPane.setPrefSize(LIST_PREF_WIDTH, (frameHeight - LIST_SHRINK_HEIGHT) / 2d - TITLEDPANE_HEADER_HEIGHT);
+        selfChosenPane.setPrefSize(LIST_PREF_WIDTH, (frameHeight - LIST_SHRINK_HEIGHT) / 2d - TITLEDPANE_HEADER_HEIGHT - 2);
+        mainCanvas.setCanvasWidth(frameWidth - CANVAS_SHRINK_WIDTH);
+        mainCanvas.setCanvasHeight(frameHeight - CANVAS_SHRINK_HEIGHT);
         mainCanvas.updateCoordinateSystem();
         updateCanvas();
     }
@@ -98,6 +107,13 @@ public class MainController implements Initializable, ControlledStage {
         }
     }
 
+    private void updateMenu() {
+        if (UserStorager.get().getCurrentUser() == null)
+            return;
+        uidMenu.setText(UID_STIRNG + UserStorager.get().getCurrentUser().getUid());
+        userNameMenu.setText(USERNAME_STRING + UserStorager.get().getCurrentUser().getUserName());
+    }
+
     private void createAbsAnchor(AnchorPane pane, Node child, double up, double left, double right, double down) {
         pane.setTopAnchor(child, up);
         pane.setLeftAnchor(child, left);
@@ -126,10 +142,15 @@ public class MainController implements Initializable, ControlledStage {
         frameHeight = newValue.doubleValue();
         reLayout();
     };
+    private ChangeListener<Boolean> stageShowingChangeListener = (observable, oldValue, newValue) -> {
+        if (newValue == false)
+            return;
+        updateMenu();
+    };
 
     @Override
     public void setShowingChangeListener(Stage stage) {
-        //do nothing
+        stage.showingProperty().addListener(stageShowingChangeListener);
     }
 
     /**

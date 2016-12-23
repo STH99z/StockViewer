@@ -15,6 +15,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -89,6 +90,12 @@ public class LoginStageController implements Initializable, ControlledStage {
         try {
             registerButton.setOnAction(regiterButtonHandler);
             loginButton.setOnAction(loginButtonHandler);
+            loginButton.setOnKeyPressed(event -> {
+                if (event.getCode() == KeyCode.ENTER) loginButton.fire();
+            });
+            passwordField.setOnKeyPressed(event -> {
+                if (event.getCode() == KeyCode.ENTER) loginButton.fire();
+            });
             UserStorager.get().readFromFile("users.dat");
         } catch (Exception e) {
             e.printStackTrace();
