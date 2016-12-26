@@ -1,10 +1,12 @@
 package com.sth99.stockviewer.data;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * 基础信息数据结构
  * Created by STH99 on 2016/12/23.
  */
 public class FundamentalData extends WebData {
@@ -52,19 +54,19 @@ public class FundamentalData extends WebData {
         return values;
     }
 
-    public FundamentalData(StockCodeData code) throws MalformedURLException {
+    public FundamentalData(StockCodeData code) throws MalformedURLException, IOException {
         super("http://hq.sinajs.cn/list=" + code.getFullCode());
         this.code = code;
         this.setCharsetName("GBK");
         processData();
     }
 
-    public void processData() {
+    public void processData() throws IOException {
         Matcher matcher = dataFilter.matcher(getData());
         matcher.find();
         String toSplit = matcher.group(1);
         values = toSplit.split(",");
-        if (values.length != DATA_COUNT - 1)
+        if (values.length != DATA_COUNT + 1)
             System.out.println("Data process failed. " + values.length + " Data:" + getData());
     }
 }

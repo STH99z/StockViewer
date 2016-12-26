@@ -1,5 +1,7 @@
 package com.sth99.stockviewer.data;
 
+import com.sth99.stockviewer.util.MathUtil;
+
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -31,34 +33,25 @@ public class WebData extends Data {
         this.charsetName = charsetName;
     }
 
-    public String getData() {
+    public String getData() throws IOException {
         if (isGetCalled)
             return result;
-        try {
-            if (stringBuffer == null) {
-                inputStreamReader = new InputStreamReader(url.openStream(), charsetName);
-                bufferedReader = new BufferedReader(inputStreamReader);
-                stringBuffer = new StringBuffer(0x1000);
-                while (true) {
-                    int read = bufferedReader.read();
-                    if (read == -1)
-                        break;
-                    stringBuffer.append((char) read);
-                }
-                bufferedReader.close();
-                result = stringBuffer.toString();
-                if (result.length() == 0) {
-                    System.out.println("网络文件长度为0");
-                }
+        if (stringBuffer == null) {
+            inputStreamReader = new InputStreamReader(url.openStream(), charsetName);
+            bufferedReader = new BufferedReader(inputStreamReader);
+            stringBuffer = new StringBuffer(0x1000);
+            while (true) {
+                int read = bufferedReader.read();
+                if (read == -1)
+                    break;
+                stringBuffer.append((char) read);
             }
-        } catch (FileNotFoundException fnfe) {
-            System.out.println("网络文件未找到");
-            stringBuffer = new StringBuffer();
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-            stringBuffer = new StringBuffer();
-        } finally {
+            bufferedReader.close();
+            result = stringBuffer.toString();
             isGetCalled = true;
+//            if (result.length() == 0) {
+//                System.out.println("网络文件长度为0");
+//            }
         }
         return result;
     }
@@ -72,6 +65,40 @@ public class WebData extends Data {
         BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName));
         bufferedWriter.write(getData());
         bufferedWriter.close();
+    }
+
+    public void loadData(String fileName) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(fileName));
+        stringBuffer = new StringBuffer(0x1000);
+        String line;
+        while ((line = bufferedReader.readLine()) != null)
+            stringBuffer.append(line);
+        result = stringBuffer.toString();
+        isGetCalled = true;
+    }
+
+    private String getDefaultFilePath() {
+        String b = MathUtil.base64Encode(url.getFile());
+        return "data\\" + b.replaceAll("\\\\", "").replaceAll("=", "") + ".bin";
+    }
+
+    public void deleteFile() {
+        File file = new File(getDefaultFilePath());
+        if (file.exists())
+            file.delete();
+    }
+
+    public boolean fileExist() {
+        File file = new File(getDefaultFilePath());
+        return file.exists();
+    }
+
+    public void saveData() throws IOException {
+        saveData(getDefaultFilePath());
+    }
+
+    public void loadData() throws IOException {
+        loadData(getDefaultFilePath());
     }
 
     @Override

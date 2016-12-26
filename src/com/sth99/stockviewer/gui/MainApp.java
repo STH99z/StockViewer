@@ -41,8 +41,8 @@ public class MainApp extends Application {
         stageController.getStage(mainViewID).setTitle("STOCK VIEWER");
 
 
-//        stageController.setStage(loginViewID);
-        stageController.setStage(mainViewID);
+        stageController.setStage(loginViewID);
+//        stageController.setStage(mainViewID);
     }
 
     public String relatedPath(String path) {

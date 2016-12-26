@@ -1,5 +1,6 @@
 package com.sth99.stockviewer.data;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -19,13 +20,13 @@ public class MinuteDataSet extends WebData {
     StockCodeData code;
     ArrayList<MinuteData> minuteDataList;
 
-    public MinuteDataSet(StockCodeData code) throws MalformedURLException {
+    public MinuteDataSet(StockCodeData code) throws MalformedURLException, IOException {
         super("http://data.gtimg.cn/flashdata/hushen/minute/" + code.getFullCode() + ".js");
         this.code = code;
         processData();
     }
 
-    private void processData() {
+    private void processData() throws IOException {
         Matcher dateMatcher = dateFilter.matcher(getData());
         if (dateMatcher.find()) {
             year = Short.valueOf(dateMatcher.group(1));

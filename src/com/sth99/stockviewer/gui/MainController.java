@@ -6,6 +6,8 @@ import com.sth99.stockviewer.gui.component.MinuteChart;
 import com.sth99.stockviewer.user.UserStorager;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -13,8 +15,10 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -37,7 +41,9 @@ public class MainController implements Initializable, ControlledStage {
     };
     private StageController stageController;
     @FXML
-    private MenuItem uidMenu, userNameMenu;
+    private MenuItem uidMenu, userNameMenu, menuSwapUser;
+    @FXML
+    private CheckMenuItem menuDefaultSave;
     @FXML
     private BorderPane mainPane;
     @FXML
@@ -49,7 +55,7 @@ public class MainController implements Initializable, ControlledStage {
     @FXML
     private TextField stockListField;
     @FXML
-    private ListView<StockCodeData> stockListView;
+    private ListView<StockCodeData> stockListView, stockListViewSelf;
     @FXML
     private BorderPane selfChosenPane;
     @FXML
@@ -70,10 +76,38 @@ public class MainController implements Initializable, ControlledStage {
     private StockCanvas mainCanvas[];
     @FXML
     private TabPane mainTabPane;
+    @FXML
+    private ProgressBar progressBar;
+    @FXML
+    private Label
+            labelBasicName,
+            labelBasicStat,
+            labelBasicCount,
+            labelBasicAnalyzed;
+    @FXML
+    private Label
+            labelGraphName,
+            labelGraphStat,
+            labelGraphCount,
+            labelGraphAnalyzed;
+    @FXML
+    private Label
+            labelLocalName,
+            labelLocalStat,
+            labelLocalCount,
+            labelLocalAnalyzed;
+    @FXML
+    private Button buttonSaveToLocal, buttonDeleteLocal;
+    @FXML
+    private Button buttonAddToSelfList, buttonRemoveFromSelfList;
+    private Label[] labelBasicGroup = new Label[4];
+    private Label[] labelGraphGroup = new Label[4];
+    private Label[] labelLocalGroup = new Label[4];
+
 
     private static final String TODO_STRING = "" +
-            "右侧部分完成\n" +
-            "下侧部分用图表代替\n";
+            "菜单处理，换色处理，用户信息存储（自选股，颜色）\n" +
+            "自选股票存储\n";
 
     StockCodeStorager stockCodeStorager;
     StockCodeData currentStockCode;
@@ -82,9 +116,138 @@ public class MainController implements Initializable, ControlledStage {
     FundamentalData fundamentalData;
     double frameWidth, frameHeight;
 
+    private void displayException(Exception e) {
+        if (e instanceof FileNotFoundException)
+            consoleTextArea.appendText("网络文件未找到\n");
+    }
+
+    private void updateGraphData() {
+        int okCount = 0;
+        int dataCount = 0;
+        String graphOK = "";
+        String[] graphName = {"分时", "日K", "周K", "月K"};
+        if (minuteDataSet.getMinuteDataList().size() > 0) {
+            okCount++;
+            dataCount += minuteDataSet.getMinuteDataList().size();
+            graphOK += graphName[0] + " ";
+        }
+        for (int i = 0; i < kDataSet.length; i++) {
+            if (kDataSet[i].getKDataList().size() > 0) {
+                okCount++;
+                dataCount += kDataSet[i].getKDataList().size();
+                graphOK += graphName[i + 1];
+            }
+        }
+        setLabelText(labelGraphName, graphOK, okCount == 4);
+        if (okCount == 4)
+            setLabelText(labelGraphStat, "完整", true);
+        else if (okCount > 0)
+            setLabelText(labelGraphStat, "残缺", false);
+        else
+            setLabelText(labelGraphStat, "完全失败", false);
+        setLabelText(labelGraphCount, dataCount + "", dataCount > 0);
+        setLabelText(labelGraphAnalyzed, dataCount + "", dataCount > 0);
+    }
+
+    private void updateBasicDataFailed() {
+        boolean suc = false;
+        setLabelText(labelBasicName, currentStockCode.getName() + " " + currentStockCode.getFullCode(), suc);
+        setLabelText(labelBasicStat, "网络文件未找到", suc);
+        setLabelText(labelBasicCount, "0", suc);
+        setLabelText(labelBasicAnalyzed, "未解析", suc);
+    }
+
+    private void updateBasicDataSuccess() {
+        boolean suc = true;
+        setLabelText(labelBasicName, currentStockCode.getName() + " " + currentStockCode.getFullCode(), suc);
+        setLabelText(labelBasicStat, "获取数据成功", suc);
+        setLabelText(labelBasicCount, fundamentalData.getValues().length + "", suc);
+        setLabelText(labelBasicAnalyzed, FundamentalData.DATA_COUNT + "", suc);
+    }
+
+    private void saveAllData() {
+        if (minuteDataSet.getMinuteDataList().size() > 0) {
+            try {
+                minuteDataSet.saveData();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        for (int i = 0; i < kDataSet.length; i++) {
+            try {
+                kDataSet[i].saveData();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        updateLocalData();
+    }
+
+    private void deleteAllData() {
+        if (minuteDataSet != null && minuteDataSet.fileExist()) {
+            minuteDataSet.deleteFile();
+        }
+        for (int i = 0; i < kDataSet.length; i++) {
+            if (kDataSet[i] != null && kDataSet[i].fileExist()) {
+                kDataSet[i].deleteFile();
+            }
+        }
+        updateLocalData();
+    }
+
+    private void updateLocalData() {
+        int okCount = 0;
+        int kOkCount = 0;
+        int mOkCount = 0;
+        String graphOK = "";
+        String[] graphName = {"分时", "日K", "周K", "月K"};
+        if (minuteDataSet != null && minuteDataSet.fileExist()) {
+            okCount++;
+            mOkCount++;
+            graphOK += graphName[0] + " ";
+        }
+        for (int i = 0; i < kDataSet.length; i++) {
+            if (kDataSet[i] != null && kDataSet[i].fileExist()) {
+                okCount++;
+                kOkCount++;
+                graphOK += graphName[i + 1];
+            }
+        }
+        setLabelText(labelLocalName, "存在" + okCount + "个", okCount == 4);
+        if (okCount > 0)
+            buttonDeleteLocal.setDisable(false);
+        else
+            buttonDeleteLocal.setDisable(true);
+        if (okCount == 4)
+            setLabelText(labelLocalStat, "完整", true);
+        else if (okCount > 0)
+            setLabelText(labelLocalStat, "残缺", false);
+        else
+            setLabelText(labelLocalStat, "完全失败", false);
+        if (mOkCount == 1)
+            setLabelText(labelLocalCount, "完整", true);
+        else
+            setLabelText(labelLocalCount, "不存在", false);
+        if (kOkCount == 3)
+            setLabelText(labelLocalAnalyzed, "完整", true);
+        else if (kOkCount > 0)
+            setLabelText(labelLocalAnalyzed, "残缺（" + kOkCount + "）个", false);
+        else
+            setLabelText(labelLocalAnalyzed, "不存在", false);
+    }
+
+    private void setLabelText(Label label, String text, boolean OKstate) {
+        label.setText(text);
+        if (OKstate)
+            label.setTextFill(Color.DARKBLUE);
+        else
+            label.setTextFill(Color.DARKRED);
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        initializer.run();
+        initializer();
+        postInitializer();
     }
 
     private void reLayout() {
@@ -101,25 +264,47 @@ public class MainController implements Initializable, ControlledStage {
             mainCanvas[i].setCanvasHeight(frameHeight - CANVAS_SHRINK_HEIGHT);
             mainCanvas[i].updateCoordinateSystem();
         }
+        progressBar.setPrefWidth(frameWidth);
         updateCanvas();
+    }
+
+    private void retriveStockData(StockCodeData stockCodeData) {
+        currentStockCode = stockCodeData;
+        progressBar.setProgress(0d);
+        try {
+            minuteDataSet = new MinuteDataSet(stockCodeData);
+            progressBar.setProgress(0.2d);
+        } catch (Exception e) {
+            consoleTextArea.appendText(e.getMessage());
+            displayException(e);
+        }
+        for (int i = 0; i < 3; i++) {
+            try {
+                kDataSet[i] = new KDataSet(stockCodeData, KDataTimeLength.values()[i]);
+                progressBar.setProgress(progressBar.getProgress() + 0.2d);
+            } catch (Exception e) {
+                consoleTextArea.appendText(e.getMessage());
+                displayException(e);
+            }
+        }
+        updateGraphData();
+        try {
+            fundamentalData = new FundamentalData(stockCodeData);
+            updateBasicDataSuccess();
+            progressBar.setProgress(progressBar.getProgress() + 0.2d);
+        } catch (Exception e) {
+            consoleTextArea.appendText(e.getMessage());
+            updateBasicDataFailed();
+            displayException(e);
+        }
+        if (menuDefaultSave.isSelected())
+            saveAllData();
     }
 
     private void updateCodeListView() {
         String text = stockListField.getText();
         stockListView.setItems(FXCollections.observableArrayList(stockCodeStorager.getStockListFrom(text)));
-    }
-
-    private void updateCurrentStockData(StockCodeData stockCodeData) {
-        currentStockCode = stockCodeData;
-        try {
-            minuteDataSet = new MinuteDataSet(stockCodeData);
-            for (int i = 0; i < 3; i++) {
-                kDataSet[i] = new KDataSet(stockCodeData, KDataTimeLength.values()[i]);
-            }
-            fundamentalData = new FundamentalData(stockCodeData);
-        } catch (MalformedURLException mue) {
-            consoleTextArea.appendText(mue.getMessage() + "\n");
-        }
+        stockListViewSelf.setItems(FXCollections.observableArrayList(UserStorager.get().getCurrentUser().getSelfSelected()));
     }
 
     private void updateConsoleArea(StockCodeData newValue) {
@@ -166,6 +351,25 @@ public class MainController implements Initializable, ControlledStage {
         userNameMenu.setText(USERNAME_STRING + UserStorager.get().getCurrentUser().getUserName());
     }
 
+    private void addToSelfList() {
+        StockCodeData selectedItem = stockListView.getSelectionModel().getSelectedItem();
+        if (selectedItem != null && !stockListViewSelf.getItems().contains(selectedItem)) {
+            stockListViewSelf.getItems().add(selectedItem);
+        }
+    }
+
+    private void removeFromSelfList() {
+        StockCodeData selectedItem = stockListViewSelf.getSelectionModel().getSelectedItem();
+        if (selectedItem != null) {
+            int i = stockListViewSelf.getSelectionModel().getSelectedIndex();
+            stockListViewSelf.getItems().remove(i);
+        }
+    }
+
+    private void swapUser() {
+        stageController.setStage(MainApp.loginViewID, MainApp.mainViewID);
+    }
+
     private void createAbsAnchor(AnchorPane pane, Node child, double up, double left, double right, double down) {
         pane.setTopAnchor(child, up);
         pane.setLeftAnchor(child, left);
@@ -179,10 +383,23 @@ public class MainController implements Initializable, ControlledStage {
 
     private ChangeListener<String> codeFieldChangeListener = (observable, oldValue, newValue) -> updateCodeListView();
     private ChangeListener<StockCodeData> codeListSelectListener = (observable, oldValue, newValue) -> {
-        updateCurrentStockData(newValue);
+        retriveStockData(newValue);
+        updateLocalData();
         updateDetailPane();
         updateConsoleArea(newValue);
         updateCanvas();
+    };
+    private ChangeListener<StockCodeData> selfCodeListChangeListener = (observable, oldValue, newValue) -> {
+        ArrayList<StockCodeData> selfSelected = UserStorager.get().getCurrentUser().getSelfSelected();
+        selfSelected.clear();
+        for (StockCodeData stockCodeData : stockListViewSelf.getItems()) {
+            selfSelected.add(stockCodeData);
+        }
+        try {
+            UserStorager.get().getCurrentUser().saveSelfList();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     };
     private ChangeListener<Number> widthResizeListener = (observable, oldValue, newValue) -> {
         if (frameWidth == 1200d && newValue.doubleValue() < 1200)
@@ -200,7 +417,16 @@ public class MainController implements Initializable, ControlledStage {
         if (newValue == false)
             return;
         updateMenu();
+        updateSelfList();
     };
+
+    private void updateSelfList() {
+        ObservableList<StockCodeData> items = stockListViewSelf.getItems();
+        items.clear();
+        for (StockCodeData stockCodeData : UserStorager.get().getCurrentUser().getSelfSelected()) {
+            items.add(stockCodeData);
+        }
+    }
 
     @Override
     public void setShowingChangeListener(Stage stage) {
@@ -210,18 +436,26 @@ public class MainController implements Initializable, ControlledStage {
     /**
      * 后初始化器，包含网络操作，这个时候先显示界面。后初始化放在与initialize不同的线程。
      */
-    public Runnable postInitializer = () -> {
+    public void postInitializer() {
         stockCodeStorager = new StockCodeStorager();
         stockListField.textProperty().addListener(codeFieldChangeListener);
         stockListView.getSelectionModel().selectedItemProperty().addListener(codeListSelectListener);
+        stockListViewSelf.getSelectionModel().selectedItemProperty().addListener(codeListSelectListener);
+        stockListViewSelf.getSelectionModel().selectedItemProperty().addListener(selfCodeListChangeListener);
         currentStockCode = new StockCodeData("", "sh600000");
         stockListField.setText("600");
         stockListView.getSelectionModel().select(0);
-    };
+        buttonSaveToLocal.setOnAction(event -> saveAllData());
+        buttonDeleteLocal.setOnAction(event -> deleteAllData());
+        buttonAddToSelfList.setOnAction(event -> addToSelfList());
+        buttonRemoveFromSelfList.setOnAction(event -> removeFromSelfList());
+        menuSwapUser.setOnAction(event -> swapUser());
+    }
+
     /**
      * 初始化器，在initialize中调用（同线程）。
      */
-    private Runnable initializer = () -> {
+    private void initializer() {
         //MainApp Pane Initialize
         frameWidth = 1200d;
         frameHeight = 800d;
@@ -233,24 +467,31 @@ public class MainController implements Initializable, ControlledStage {
         rightAreaInitialize();
         //MainApp Pane Listener
         addMainPaneListener();
-
-        new Thread(postInitializer).start();
-    };
+    }
 
     private void bottomAreaInitialize() {
         consoleTextArea = new TextArea(TODO_STRING);
-        try {
-            consoleTextArea.appendText(new String(new ColorData(100, 200, 100).toByteData()));
-            consoleTextArea.appendText("\n");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        consoleTextArea.appendText("\n");
         consoleTextField = new TextField("console in");
         consolePane.getChildren().addAll(consoleTextArea, consoleTextField);
         createAbsAnchor(consolePane, consoleTextArea, 0d, 0d, 0d, 23d);
         consolePane.setBottomAnchor(consoleTextField, 0d);
         consolePane.setLeftAnchor(consoleTextField, 0d);
         consolePane.setRightAnchor(consoleTextField, 0d);
+
+        labelBasicGroup[0] = labelBasicName;
+        labelBasicGroup[1] = labelBasicStat;
+        labelBasicGroup[2] = labelBasicCount;
+        labelBasicGroup[3] = labelBasicAnalyzed;
+        labelGraphGroup[0] = labelGraphName;
+        labelGraphGroup[1] = labelGraphStat;
+        labelGraphGroup[2] = labelGraphCount;
+        labelGraphGroup[3] = labelGraphAnalyzed;
+        labelLocalGroup[0] = labelLocalName;
+        labelLocalGroup[1] = labelLocalStat;
+        labelLocalGroup[2] = labelLocalCount;
+        labelLocalGroup[3] = labelLocalAnalyzed;
+
     }
 
     private void centerAreaInitialize() {

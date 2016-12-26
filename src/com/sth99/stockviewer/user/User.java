@@ -1,8 +1,11 @@
 package com.sth99.stockviewer.user;
 
+import com.sth99.stockviewer.data.StockCodeData;
 import com.sth99.stockviewer.util.MathUtil;
 
+import java.io.*;
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 /**
@@ -14,22 +17,27 @@ public class User {
     private String userName;
     private String password;
 
+    ArrayList<StockCodeData> selfSelected;
+
     private User(long uid, String userName, String password) {
         this.uid = uid;
         this.userName = userName;
         this.password = password;
+        selfSelected = new ArrayList<>();
     }
 
     public User() {
         uid = generateUid();
         userName = "";
         password = "";
+        selfSelected = new ArrayList<>();
     }
 
     public User(String userName, String password) {
         this.uid = generateUid();
         this.userName = userName;
         this.password = password;
+        selfSelected = new ArrayList<>();
     }
 
     public User(String encodedSaveData) throws Exception {
@@ -41,6 +49,7 @@ public class User {
         uid = Long.valueOf(split[0]);
         userName = split[1];
         password = split[2];
+        loadSelfList();
     }
 
     private long generateUid() {
@@ -99,5 +108,33 @@ public class User {
         System.arraycopy(bytes1, 0, bytes, 4, len);
         System.arraycopy(MathUtil.int2Byte(len), 0, bytes, 0, 4);
         return bytes;
+    }
+
+    public void saveSelfList() throws IOException {
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("userdata\\" + getUserName() + ".bin"));
+        for (StockCodeData stockCodeData : selfSelected) {
+            bufferedWriter.write(stockCodeData.getName() + ";" + stockCodeData.getFullCode() + "\n");
+        }
+        bufferedWriter.close();
+    }
+
+    public ArrayList<StockCodeData> getSelfSelected() {
+        return selfSelected;
+    }
+
+    public void loadSelfList() throws IOException {
+        try {
+            BufferedReader bufferedReader = new BufferedReader(new FileReader("userdata\\" + getUserName() + ".bin"));
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                String[] sp = line.split(";");
+                selfSelected.add(new StockCodeData(sp[0], sp[1]));
+            }
+            bufferedReader.close();
+            System.out.println("User " + getUserName() + " has " + selfSelected.size() + " selected stock.");
+        } catch (FileNotFoundException e) {
+            System.out.println("User " + getUserName() + " has no selected stock.");
+        }
+
     }
 }

@@ -1,5 +1,6 @@
 package com.sth99.stockviewer.data;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,7 +29,7 @@ public class KDataSet extends WebData {
      * @param code
      * @throws MalformedURLException
      */
-    public KDataSet(StockCodeData code) throws MalformedURLException {
+    public KDataSet(StockCodeData code) throws MalformedURLException, IOException {
         this(code, KDataTimeLength.daily);
     }
 
@@ -39,14 +40,14 @@ public class KDataSet extends WebData {
      * @param timeLength 时间长度
      * @throws MalformedURLException
      */
-    public KDataSet(StockCodeData code, KDataTimeLength timeLength) throws MalformedURLException {
+    public KDataSet(StockCodeData code, KDataTimeLength timeLength) throws MalformedURLException, IOException {
         super(timeLength.toUrlPrePart() + code.getFullCode() + ".js?maxage=" + maxAge);
         this.code = code;
         this.timeLength = timeLength;
         processData();
     }
 
-    private void processData() {
+    private void processData() throws IOException {
         Matcher matcher = dataFilter.matcher(getData());
         KDataList = new ArrayList<>();
         while (matcher.find()) {
