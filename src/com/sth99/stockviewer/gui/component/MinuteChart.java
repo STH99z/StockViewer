@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * 日股票价格走势图
  * Created by STH99 on 2016/12/23.
  */
-public class MinuteChart extends Chart implements IDrawable {
+public class MinuteChart extends Chart {
     ArrayList<MinuteData> minuteDataList;
     private double xStart, xEnd, yStart, yEnd;
 

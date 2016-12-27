@@ -105,9 +105,7 @@ public class MainController implements Initializable, ControlledStage {
     private Label[] labelLocalGroup = new Label[4];
 
 
-    private static final String TODO_STRING = "" +
-            "菜单处理，换色处理，用户信息存储（自选股，颜色）\n" +
-            "自选股票存储\n";
+    private static final String TODO_STRING = "";
 
     StockCodeStorager stockCodeStorager;
     StockCodeData currentStockCode;

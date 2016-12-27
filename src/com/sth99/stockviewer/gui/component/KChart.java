@@ -9,7 +9,7 @@ import java.util.ArrayList;
 /**
  * Created by STH99 on 2016/12/19.
  */
-public class KChart extends Chart implements IDrawable {
+public class KChart extends Chart {
     ArrayList<KData> kDataList;
     ArrayList<Candle> candles;
     private double xStart, xEnd, yStart, yEnd;

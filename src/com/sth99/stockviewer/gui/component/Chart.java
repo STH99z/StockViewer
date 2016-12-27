@@ -6,7 +6,7 @@ import javafx.scene.canvas.GraphicsContext;
  * 图表的基类
  * Created by STH99 on 2016/12/19.
  */
-public abstract class Chart {
+public abstract class Chart implements IDrawable {
     private boolean chartLocated = false;
 
     public void locateChart(CoordinateSystem system, double xStart, double xEnd, double yStart, double yEnd) {

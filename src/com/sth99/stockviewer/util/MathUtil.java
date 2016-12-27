@@ -93,11 +93,4 @@ public class MathUtil {
         }
         return result;
     }
-
-//    @TEST
-//    public static void main(String[] args) {
-//        String result = base64Encode("asdjklasdjkl12389");
-//        System.out.println(result);
-//        System.out.println(base64Decode(result));
-//    }
 }

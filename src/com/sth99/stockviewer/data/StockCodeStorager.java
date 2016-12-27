@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 import com.sth99.stockviewer.util.MathUtil;
 
 /**
+ * StockCodeData存储类，负责快速查询等
  * Created by STH99 on 2016/12/8.
  */
 public class StockCodeStorager {
